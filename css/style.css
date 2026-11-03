@@ -1,0 +1,481 @@
+/* ==========================================================
+   Portfolio Level Design – Rimet Tao
+   Charte reprise du CV_16_Export :
+   - Rajdhani Bold / Semibold  → titres, noms, bandeaux
+   - Caviar Dreams / Bold      → sous-titres, corps de texte, mots clés
+   - Violet #644497 · Lilas #aa80cc · Nuit #1e0e3b · Blanc #fefefe
+   ========================================================== */
+
+@font-face {
+  font-family: "Caviar Dreams";
+  src: url("../fonts/CaviarDreams.woff2") format("woff2"),
+       url("../fonts/CaviarDreams.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Caviar Dreams";
+  src: url("../fonts/CaviarDreams_Bold.woff2") format("woff2"),
+       url("../fonts/CaviarDreams_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --violet: #644497;
+  --lilac: #aa80cc;
+  --night: #1e0e3b;
+  --white: #fefefe;
+  --line-soft: rgba(100, 68, 151, .18);
+
+  --f-title: "Rajdhani", "Arial Narrow", sans-serif;
+  --f-body: "Caviar Dreams", "Quicksand", "Trebuchet MS", sans-serif;
+
+  --topbar-h: 92px;
+  --content-w: 1180px;
+  --gutter: clamp(16px, 4vw, 40px);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--night);
+  font-family: var(--f-body);
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+img, video { max-width: 100%; display: block; }
+a { color: inherit; }
+b, strong { font-weight: 700; color: var(--violet); }
+
+/* Fond animé : courbes de niveau (voir js/bg.js) */
+#bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ---------- Grille violette du CV (bandeaux) ---------- */
+.grid-bg {
+  background-color: var(--violet);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .07) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, .07) 2px, transparent 2px),
+    linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+  background-size: 64px 64px, 64px 64px, 16px 16px, 16px 16px;
+}
+
+/* ---------- Bandeau supérieur (ex bandeau latéral du CV) ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 3vw, 36px);
+  padding: 10px var(--gutter);
+  color: var(--white);
+  box-shadow: 0 2px 0 var(--night);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+.brand .badge { width: 72px; height: 72px; }
+.brand-name {
+  display: block;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: .04em;
+}
+.brand-sub {
+  display: block;
+  font-size: 15px;
+  margin-top: 4px;
+  opacity: .92;
+}
+
+.tabs {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px clamp(8px, 1.6vw, 26px);
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--white);
+  text-decoration: none;
+  white-space: nowrap;
+}
+/* traits de part et d'autre, comme les titres du bandeau du CV */
+.tab::before, .tab::after {
+  content: "";
+  height: 2px;
+  width: 0;
+  background: var(--white);
+  transition: width .25s ease;
+}
+.tab:hover::before, .tab:hover::after,
+.tab[aria-current="page"]::before, .tab[aria-current="page"]::after { width: 18px; }
+.tab:focus-visible, .lang button:focus-visible, .tile:focus-visible, .btn:focus-visible {
+  outline: 2px dashed var(--white);
+  outline-offset: 3px;
+}
+
+.lang {
+  display: flex;
+  flex: 0 0 auto;
+  border: 2px solid var(--white);
+}
+.lang button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--white);
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 18px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.lang button[aria-pressed="true"] { background: var(--white); color: var(--violet); }
+
+.menu-btn {
+  display: none;
+  appearance: none;
+  border: 2px solid var(--white);
+  background: transparent;
+  color: var(--white);
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 18px;
+  padding: 4px 12px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/* ---------- Contenu ---------- */
+main {
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: var(--content-w);
+  margin: 0 auto;
+  padding: 44px var(--gutter) 72px;
+}
+
+.name {
+  margin: 0;
+  text-align: center;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: clamp(48px, 8vw, 84px);
+  line-height: 1;
+  letter-spacing: .02em;
+}
+.role {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: clamp(22px, 3vw, 32px);
+}
+.traits {
+  margin: 28px 0 40px;
+  text-align: center;
+  font-size: clamp(18px, 2.6vw, 30px);
+}
+
+/* Titre de section : trait – TITRE – trait (comme EXPERIENCE / HOBBIES) */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 56px 0 28px;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: clamp(24px, 3vw, 32px);
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+.section-title::before, .section-title::after {
+  content: "";
+  flex: 1;
+  height: 3px;
+  background: var(--night);
+}
+.section-title.sm { font-size: 22px; margin: 40px 0 20px; }
+.section-title.sm::before, .section-title.sm::after { height: 2px; }
+
+/* Vidéo d'accueil */
+.hero-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 3px solid var(--night);
+  background: var(--night);
+  overflow: hidden;
+}
+.hero-video video { width: 100%; height: 100%; object-fit: cover; }
+
+/* Emplacements de médias à compléter */
+.ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+  color: var(--white);
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 22px;
+}
+.ph.fill { position: absolute; inset: 0; }
+.ph-box { aspect-ratio: 16 / 9; border: 3px solid var(--night); }
+
+/* ---------- Grille de projets + survol vidéo ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 28px;
+}
+.tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 3px solid var(--night);
+  background: var(--night);
+  text-decoration: none;
+  color: var(--white);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.tile:hover, .tile:focus-visible { transform: translateY(-4px); box-shadow: 6px 6px 0 var(--lilac); }
+.tile .media, .tile video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tile .media.ph { padding-bottom: 64px; }
+.tile video { opacity: 0; transition: opacity .25s ease; }
+.tile.playing video { opacity: 1; }
+.tile .cap {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 36px 16px 12px;
+  background: linear-gradient(transparent, rgba(30, 14, 59, .92));
+}
+.tile .cap-title {
+  display: block;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.1;
+}
+.tile .cap-meta { display: block; font-size: 15px; opacity: .92; }
+.tile .chip {
+  position: absolute;
+  top: 12px; left: 12px;
+  padding: 2px 10px;
+  background: var(--white);
+  color: var(--violet);
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.empty {
+  padding: 40px 16px;
+  text-align: center;
+  border: 2px dashed var(--lilac);
+  background: rgba(255, 255, 255, .7);
+}
+
+/* ---------- Bandeau projet (retravail du bandeau fourni) ---------- */
+.banner {
+  margin: 0 0 36px;
+  padding: 10px;
+  color: var(--white);
+}
+.banner-in {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  border: 2px solid var(--white);
+  min-height: 220px;
+}
+.banner-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 34px);
+  padding: 18px clamp(14px, 2.6vw, 38px);
+  border-right: 2px solid var(--white);
+}
+.banner .logo { flex: 0 0 auto; width: clamp(96px, 12vw, 150px); aspect-ratio: 1; position: relative; }
+.banner .logo .badge { width: 100%; height: 100%; }
+.banner .logo span {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-title); font-weight: 600; font-size: clamp(16px, 2vw, 24px);
+  text-align: center; padding: 14%;
+}
+.banner h1 {
+  margin: 0 0 6px;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.banner .line {
+  display: block;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(18px, 2.3vw, 30px);
+  line-height: 1.3;
+}
+.banner-right { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.banner-right img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.banner-right .ph { position: relative; font-size: clamp(22px, 2.6vw, 32px); background: none; }
+
+/* ---------- Pages projet ---------- */
+.back {
+  display: inline-block;
+  margin-bottom: 18px;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 20px;
+  text-decoration: none;
+  color: var(--violet);
+}
+.back:hover { text-decoration: underline; }
+.proj-context { font-size: 20px; margin: 0 0 8px; }
+.roles { margin: 0; padding: 0; list-style: none; }
+.roles li { padding-left: 22px; position: relative; margin: 6px 0; }
+.roles li::before { content: "–"; position: absolute; left: 0; color: var(--violet); font-weight: 700; }
+.block { margin: 0 0 8px; }
+.block h3 {
+  margin: 34px 0 10px;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 28px;
+}
+.block p { margin: 0 0 12px; max-width: 78ch; }
+.block figure { margin: 18px 0; }
+.block figcaption { font-size: 15px; margin-top: 6px; opacity: .85; }
+.todo { opacity: .6; font-style: italic; }
+.links { display: flex; flex-wrap: wrap; gap: 16px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px 8px 10px;
+  background: var(--violet);
+  color: var(--white);
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 20px;
+  text-decoration: none;
+  border: 2px solid var(--night);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--lilac); }
+.btn .badge { width: 44px; height: 44px; }
+
+/* ---------- Page Infos ---------- */
+.about { display: grid; grid-template-columns: 1fr; gap: 32px; }
+.about p { margin: 0 0 14px; max-width: 78ch; }
+.skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 40px; }
+.skill-col h3 {
+  margin: 0 0 8px;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--violet);
+}
+.skill-col ul { list-style: none; margin: 0 0 14px; padding: 0; }
+.icon-row { display: flex; flex-wrap: wrap; gap: 14px 6px; align-items: flex-start; }
+.icon-item { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 58px; font-size: 13px; text-align: center; white-space: nowrap; }
+.icon-item .badge { width: 52px; height: 52px; }
+.hobbies { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; text-align: center; }
+.hobby .badge { width: 120px; height: 120px; margin: 0 auto 8px; }
+.hobby strong { font-family: var(--f-title); font-weight: 700; color: var(--night); font-size: 22px; display: block; }
+.hobby span { display: block; }
+
+/* ---------- Pied de page : barre de contact du CV ---------- */
+.footer {
+  flex: 0 0 auto;
+  background: var(--night);
+  color: var(--white);
+  padding: 16px var(--gutter);
+}
+.footer ul {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: var(--content-w);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 14px 24px;
+}
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: 18px;
+}
+.footer a:hover span { text-decoration: underline; }
+.footer .badge { width: 44px; height: 44px; }
+.copyright { text-align: center; font-size: 13px; opacity: .6; margin-top: 10px; }
+
+/* ---------- Badges (forme du CV : disque + double polygone) ---------- */
+.badge { display: block; overflow: visible; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 900px) {
+  .topbar { flex-wrap: wrap; }
+  .menu-btn { display: inline-block; }
+  .lang { margin-left: 0; }
+  .tabs { display: none; flex: 1 1 100%; flex-direction: column; align-items: flex-start; order: 5; padding-top: 6px; }
+  .topbar.open .tabs { display: flex; }
+  .banner-in { grid-template-columns: 1fr; }
+  .banner-left { border-right: 0; border-bottom: 2px solid var(--white); }
+  .banner-right { min-height: 180px; }
+}
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .brand-name { font-size: 22px; }
+  .brand .badge { width: 56px; height: 56px; }
+  .footer ul { flex-direction: column; align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .tile, .btn, .tab::before, .tab::after { transition: none; }
+}
