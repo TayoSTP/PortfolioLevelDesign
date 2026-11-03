@@ -10,18 +10,22 @@ Site statique (HTML / CSS / JS, sans framework) hébergé avec GitHub Pages.
 ## Ce qu'il reste à déposer
 | Quoi | Où | Remarque |
 |---|---|---|
-| Police **Caviar Dreams** (normal + gras) | `fonts/CaviarDreams.woff2` ou `.ttf`, `fonts/CaviarDreams_Bold.woff2` ou `.ttf` | Tant qu'elle est absente, la police de repli Quicksand s'affiche. Rajdhani est chargée depuis Google Fonts. |
-| Vidéo d'accueil | `media/intro.mp4` | Chemin réglable dans `js/data.js` (`site.introVideo`). Format conseillé : MP4 H.264, moins de 25 Mo. |
-| Médias de chaque projet | `media/<projet>/…` | Références à renseigner dans `js/data.js` : `cover`, `preview` (vidéo au survol), `logo`, `map`. |
-| URL LinkedIn | `js/data.js` → `site.contact.linkedin` | |
+| Vidéo d'accueil | `media/intro.mp4` | Chemin réglable dans `js/data.js` (`site.introVideo`). MP4 H.264 conseillé, moins de 25 Mo. |
+| Médias de chaque projet | `media/<projet>/…` | À référencer dans `js/data.js` : `cover`, `preview` (vidéo au survol), `logo`, `map`. |
+| Nombre de personnes / moteur | `js/data.js` → `team`, `engine`, `engineIcon` | `team: null` affiche « ? ». Sans icône de moteur, un monogramme s'affiche (`engineMark`). |
 
 ## Modifier le contenu
-Tout le contenu (projets, textes FR/EN, compétences, loisirs) est dans **`js/data.js`**.
+Tout le contenu (projets, textes FR/EN, compétences, loisirs, contacts) est dans **`js/data.js`**.
 Les mots entre `<b>…</b>` s'affichent en violet gras, comme dans le CV.
+
+## Charte
+- Polices : **Rajdhani** (titres, via Google Fonts) et **Caviar Dreams** (corps, fichiers dans `fonts/`).
+- Contour des icônes : `assets/ring_white.png` / `assets/ring_night.png`, extraits pixel par pixel du CV.
+  Les icônes, la photo et le fond lilas (`assets/disc_lilac.png`) sont découpés à la même forme polygonale.
+- CV téléchargeable en deux versions : `assets/CV_Rimet_Tao_Couleur.pdf` et `assets/CV_Rimet_Tao_Imprimable.pdf`.
 
 ## Structure
 - `index.html` : squelette de la page
 - `css/style.css` : charte (polices, palette, bandeaux, badges du CV)
 - `js/bg.js` : fond animé (courbes de niveau générées en code, réglages en tête de fichier)
-- `js/app.js` : navigation par onglets, bascule FR/EN, vidéo au survol
-- `assets/` : photo, CV PDF, icônes du CV
+- `js/app.js` : navigation par onglets, bascule FR/EN, vidéo au survol, menu de téléchargement du CV

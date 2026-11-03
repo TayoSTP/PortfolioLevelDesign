@@ -10,6 +10,7 @@
   const canvas = document.getElementById("bg");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
+  if (!ctx) return; // le fond blanc du CSS reste affiché si le canvas est indisponible
 
   /* ----- réglages (ajuster ici le rendu) ----- */
   const CELL = 12;          // taille d'une cellule du champ, en px CSS (plus petit = plus fin, plus lourd)
@@ -84,9 +85,12 @@
   /* ----- dimensions ----- */
   let W = 0, H = 0, cols = 0, rows = 0, field = null;
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = window.innerWidth;
     H = window.innerHeight;
+    // netteté limitée à 2x et surface plafonnée (certains navigateurs refusent les très grands canvas)
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const MAX_PIXELS = 8e6;
+    if (W * H * dpr * dpr > MAX_PIXELS) dpr = Math.max(1, Math.sqrt(MAX_PIXELS / (W * H)));
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

@@ -22,8 +22,9 @@ window.PORTFOLIO = {
     contact: {
       phone: "+33681287945",
       email: "taorimet@gmail.com",
-      linkedin: "#", // TODO : mettre l'URL du profil LinkedIn
-      cv: "assets/CV_Rimet_Tao.pdf"
+      linkedin: "https://www.linkedin.com/in/tao-rimet-256a21330",
+      cvColor: "assets/CV_Rimet_Tao_Couleur.pdf",
+      cvPrint: "assets/CV_Rimet_Tao_Imprimable.pdf"
     }
   },
 
@@ -134,12 +135,53 @@ window.PORTFOLIO = {
       duration: { fr: "À compléter", en: "To be completed" },
       engine: "Source 2 – Hammer",
       engineIcon: null,
-      team: 1,
+      engineMark: "S2", // pas de logo fourni : monogramme en attendant
+      team: null,       // nombre de personnes à renseigner
       cover: null, preview: null, logo: null, map: null,
       context: {
         fr: "Map Counter-Strike 2 réalisée avec les Workshop Tools (Hammer).",
         en: "Counter-Strike 2 map made with the Workshop Tools (Hammer)."
       },
+      roles: [],
+      sections: [
+        { title: { fr: "Vue d'ensemble", en: "Overview" } },
+        { title: { fr: "Intentions et flow", en: "Intentions and flow" } },
+        { title: { fr: "Ce que j'ai appris", en: "What I learned" } }
+      ],
+      links: []
+    },
+    {
+      id: "gamejam-fast-fps",
+      category: "personal",
+      title: "Game Jam",
+      genre: { fr: "Fast FPS", en: "Fast FPS" },
+      type: { fr: "Level Design – Game Jam", en: "Level Design – Game Jam" },
+      duration: { fr: "À compléter", en: "To be completed" },
+      engine: "Unity",
+      engineIcon: "unity",
+      team: null,
+      cover: null, preview: null, logo: null, map: null,
+      context: { fr: "Fast FPS réalisé en Game Jam sous Unity.", en: "Fast FPS made during a Game Jam on Unity." },
+      roles: [],
+      sections: [
+        { title: { fr: "Vue d'ensemble", en: "Overview" } },
+        { title: { fr: "Intentions et flow", en: "Intentions and flow" } },
+        { title: { fr: "Ce que j'ai appris", en: "What I learned" } }
+      ],
+      links: []
+    },
+    {
+      id: "gamejam-beat-em-up",
+      category: "personal",
+      title: "Game Jam",
+      genre: { fr: "Beat'em Up", en: "Beat'em Up" },
+      type: { fr: "Level Design – Game Jam", en: "Level Design – Game Jam" },
+      duration: { fr: "À compléter", en: "To be completed" },
+      engine: "Unity",
+      engineIcon: "unity",
+      team: null,
+      cover: null, preview: null, logo: null, map: null,
+      context: { fr: "Beat'em Up réalisé en Game Jam sous Unity.", en: "Beat'em Up made during a Game Jam on Unity." },
       roles: [],
       sections: [
         { title: { fr: "Vue d'ensemble", en: "Overview" } },
@@ -157,7 +199,45 @@ window.PORTFOLIO = {
       duration: { fr: "À compléter", en: "To be completed" },
       engine: "",
       engineIcon: null,
-      team: 1,
+      team: null,
+      cover: null, preview: null, logo: null, map: null,
+      context: { fr: "Exercice de Level Design.", en: "Level Design exercise." },
+      roles: [],
+      sections: [
+        { title: { fr: "Consigne", en: "Brief" } },
+        { title: { fr: "Résultat", en: "Result" } }
+      ],
+      links: []
+    },
+    {
+      id: "exercice-control",
+      category: "exercise",
+      title: "Exercice Control",
+      genre: { fr: "À compléter", en: "To be completed" },
+      type: { fr: "Exercice de Level Design", en: "Level Design exercise" },
+      duration: { fr: "À compléter", en: "To be completed" },
+      engine: "",
+      engineIcon: null,
+      team: null,
+      cover: null, preview: null, logo: null, map: null,
+      context: { fr: "Exercice de Level Design.", en: "Level Design exercise." },
+      roles: [],
+      sections: [
+        { title: { fr: "Consigne", en: "Brief" } },
+        { title: { fr: "Résultat", en: "Result" } }
+      ],
+      links: []
+    },
+    {
+      id: "exercice-3",
+      category: "exercise",
+      title: "Exercice (titre à définir)",
+      genre: { fr: "À compléter", en: "To be completed" },
+      type: { fr: "Exercice de Level Design", en: "Level Design exercise" },
+      duration: { fr: "À compléter", en: "To be completed" },
+      engine: "",
+      engineIcon: null,
+      team: null,
       cover: null, preview: null, logo: null, map: null,
       context: { fr: "Exercice de Level Design.", en: "Level Design exercise." },
       roles: [],
@@ -230,7 +310,7 @@ window.PORTFOLIO = {
     back: { fr: "← Retour", en: "← Back" },
     myRoles: { fr: "Mes missions", en: "My Roles" },
     team: { fr: "Équipe", en: "Team" },
-    people: { fr: "personnes", en: "people" },
+    people: { fr: "personne(s) sur le projet", en: "people on the project" },
     video: { fr: "Vidéo", en: "Video" },
     todo: { fr: "Texte à compléter.", en: "Text to be completed." },
     emptyCategory: { fr: "Aucun projet dans cette catégorie pour le moment.", en: "No project in this category yet." },
@@ -238,7 +318,9 @@ window.PORTFOLIO = {
     introTodo: { fr: "Vidéo d'accueil à ajouter", en: "Intro video to be added" },
     coverTodo: { fr: "Vignette à ajouter", en: "Cover to be added" },
     banner: { genre: { fr: "Genre", en: "Genre" }, logo: { fr: "Logo du jeu", en: "Game logo" }, map: { fr: "Illustration de la map", en: "Map illustration" } },
-    cvLabel: { fr: "Mon CV (PDF)", en: "My CV (PDF)" },
+    cvLabel: { fr: "Télécharger mon CV", en: "Download my CV" },
+    cvColor: { fr: "CV – version couleur", en: "CV – color version" },
+    cvPrint: { fr: "CV – version imprimable (noir et blanc)", en: "CV – printable version (black & white)" },
     linkedin: { fr: "LinkedIn", en: "LinkedIn" },
     menu: { fr: "Menu", en: "Menu" },
     notFound: { fr: "Page introuvable.", en: "Page not found." },
