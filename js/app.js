@@ -42,12 +42,12 @@
   }
   /* badge à pictogramme : fond lilas du CV + pictogramme bleu nuit (comme les icônes de contact) */
   function badgeGlyph(name, ring, kind) {
-    return '<span class="badge" aria-hidden="true"><img class="b-disc" src="assets/disc_lilac.png" alt="" draggable="false">' +
+    return '<span class="badge" aria-hidden="true"><img class="b-disc" src="assets/disc_lilac_' + (kind || "md") + '.png" alt="" draggable="false">' +
       '<svg class="b-glyph" viewBox="0 0 24 24" fill="none" stroke="#1e0e3b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (GLYPHS[name] || GLYPHS.link) + "</svg>" + ringImg(ring, kind || "md") + "</span>";
   }
   /* badge à monogramme (moteur sans logo fourni) */
   function badgeText(txt, ring, alt, kind) {
-    return '<span class="badge" role="img" aria-label="' + esc(alt || "") + '"><img class="b-disc" src="assets/disc_lilac.png" alt="" draggable="false">' +
+    return '<span class="badge" role="img" aria-label="' + esc(alt || "") + '"><img class="b-disc" src="assets/disc_lilac_' + (kind || "sm") + '.png" alt="" draggable="false">' +
       '<span class="b-text">' + esc(txt) + "</span>" + ringImg(ring, kind || "sm") + "</span>";
   }
   /* variante : contour seul (pour y superposer un logo) */
@@ -273,6 +273,26 @@
       lang = btn.dataset.lang;
       try { localStorage.setItem("lang", lang); } catch (err) { /* ignoré */ }
       route();
+      return;
+    }
+    const tel = e.target.closest('#footer a[href^="tel:"]');
+    if (tel && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      e.preventDefault();
+      const num = D.site.contact.phone;
+      const done = () => {
+        tel.setAttribute("data-tip", t(D.ui.copied));
+        tel.classList.add("tip-on");
+        setTimeout(() => { tel.setAttribute("data-tip", num); tel.classList.remove("tip-on"); }, 1600);
+      };
+      const fallback = () => {
+        const ta = document.createElement("textarea");
+        ta.value = num; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch (err) { /* ignoré */ }
+        ta.remove(); done();
+      };
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(num).then(done, fallback);
+      else fallback();
       return;
     }
     const cvBtn = e.target.closest(".cv-btn");

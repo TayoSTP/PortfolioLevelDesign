@@ -2,8 +2,10 @@
    Fond animé : courbes de niveau violettes sur fond blanc,
    recréé en code à partir de BackgroundAnimation_Big_AI_60fps.mp4.
 
-   Principe : un champ de bruit simplex 3D (x, y, temps) est découpé en
-   iso-lignes (marching squares). Les segments obtenus sont raccordés en
+   Principe : un relief (bruit simplex 3D étiré + pente diagonale + zones de
+   relief fort ou faible) est coupé à intervalle constant, comme une vraie carte
+   topographique : les pentes raides donnent des faisceaux de lignes serrées,
+   les replats de grands espaces (marching squares). Les segments obtenus sont raccordés en
    courbes continues puis tracés en courbes de Bézier passant par les milieux
    des segments : les coins sont toujours arrondis.
 
@@ -24,16 +26,20 @@
   /* ----- réglages ----- */
   const DEFAULT_PRESET = "normal";
   const PRESETS = {
-    normal: { SCALE: 0.0016 }, // zoom du relief (plus petit = formes plus larges)
-    dezoom: { SCALE: 0.0027 }
+    normal: { SCALE: 0.0036 }, // zoom du relief (plus petit = formes plus larges)
+    dezoom: { SCALE: 0.0052 }
   };
-  const CELL = 9;           // finesse du calcul, en px CSS (plus petit = plus précis, plus lourd)
-  const LEVELS = 11;        // nombre de courbes de niveau
-  const SPEED = 0.009;      // vitesse d'évolution (réduite de 80 % par rapport à 0.045)
-  const LINE = "rgba(100, 68, 151, 0.18)"; // violet du CV, opacité réduite de 50 % (0.36 → 0.18)
+  const CELL_MIN = 9;       // finesse du calcul, en px CSS (plus petit = plus précis, plus lourd)
+  const MAX_CELLS = 22000;  // plafond de calcul : sur les grands écrans les cellules grandissent un peu
+  const INTERVAL = 0.09;    // écart de hauteur entre deux courbes (plus petit = plus de lignes)
+  const SLOPE = 0.45;       // pente diagonale générale (faisceaux de lignes parallèles)
+  const WARP = 0.55;        // étirement des formes (alternance zones serrées / zones larges)
+  const AMP_MIN = 0.42;     // relief minimal dans les zones calmes (plus petit = plus de grands espaces)
+  const SPEED = 0.0045;     // vitesse d'évolution (0.045 → 0.009 → 0.0045)
+  const LINE = "rgba(100, 68, 151, 0.09)"; // violet du CV, opacité (0.36 → 0.18 → 0.09)
   const LINE_WIDTH = 1.1;
   const BACKGROUND = "#fdfdfd";
-  const MAX_FPS = 24;
+  const MAX_FPS = 12;       // le relief bouge très lentement : 12 images/s suffisent
 
   let presetName = DEFAULT_PRESET;
   try {
@@ -95,15 +101,20 @@
     );
   }
 
-  /* relief : une octave principale + une octave fine très légère (formes douces) */
+  /* relief : bruit étiré (warp) + modulation d'amplitude + pente diagonale, ramené à l'intervalle */
   function height(x, y, t) {
-    const u = x * SCALE + y * SCALE * 0.35;
-    const v = y * SCALE - x * SCALE * 0.1;
-    return noise3(u, v, t) * 0.9 + noise3(u * 1.7 + 7.3, v * 1.7 - 3.1, t * 1.3) * 0.1;
+    let u = x * SCALE, v = y * SCALE;
+    const wu = noise3(u * 0.55 + 5.2, v * 0.55 + 1.3, t * 0.7);
+    const wv = noise3(u * 0.55 - 8.1, v * 0.55 + 4.4, t * 0.7);
+    u += WARP * wu; v += WARP * wv;
+    const m = noise3(u * 0.35 + 31.7, v * 0.35 - 12.3, t * 0.5) * 0.5 + 0.5;
+    const amp = AMP_MIN + (1 - AMP_MIN) * 1.6 * m * m;
+    const n = noise3(u, v, t) * 0.88 + noise3(u * 2.1 + 7.3, v * 2.1 - 3.1, t * 1.3) * 0.12;
+    return (amp * n + SLOPE * (u * 0.85 + v * 0.4)) / INTERVAL;
   }
 
   /* ----- dimensions et tampons ----- */
-  let W = 0, H = 0, cols = 0, rows = 0, field = null;
+  let W = 0, H = 0, cols = 0, rows = 0, field = null, CELL = CELL_MIN;
   let ex = null, ey = null, nb1 = null, nb2 = null, seen = null, touched = null, nTouched = 0;
 
   function resize() {
@@ -116,6 +127,7 @@
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    CELL = Math.max(CELL_MIN, Math.ceil(Math.sqrt((W * H) / MAX_CELLS)));
     cols = Math.ceil(W / CELL) + 3;
     rows = Math.ceil(H / CELL) + 3;
     field = new Float32Array(cols * rows);
@@ -169,6 +181,7 @@
     // boucle fermée si la dernière arête rejoint la première
     const last = chain[chain.length - 1];
     const closed = chain.length > 2 && (nb1[last] === start || nb2[last] === start);
+    if (closed && chain.length < 7) return; // ignore les toutes petites boucles (points)
     strokeChain(chain, closed);
   }
 
@@ -189,8 +202,11 @@
     ctx.beginPath();
 
     const NH = rows * cols;
-    for (let l = 0; l < LEVELS; l++) {
-      const lvl = -0.8 + (1.6 * (l + 0.5)) / LEVELS;
+    // une courbe à chaque valeur entière du relief (intervalle constant)
+    let gmin = Infinity, gmax = -Infinity;
+    for (let i = 0; i < field.length; i++) { const f = field[i]; if (f < gmin) gmin = f; if (f > gmax) gmax = f; }
+    for (let lv = Math.ceil(gmin); lv <= Math.floor(gmax); lv++) {
+      const lvl = lv + 0.0001;
       nTouched = 0;
       for (let r = 0; r < rows - 1; r++) {
         for (let c = 0; c < cols - 1; c++) {
