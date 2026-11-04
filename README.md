@@ -20,9 +20,13 @@ Les mots entre `<b>…</b>` s'affichent en violet gras, comme dans le CV.
 
 ## Charte
 - Polices : **Rajdhani** (titres, via Google Fonts) et **Caviar Dreams** (corps, fichiers dans `fonts/`).
-- Contour des icônes : `assets/ring_white.png` / `assets/ring_night.png`, extraits pixel par pixel du CV.
-  Les icônes, la photo et le fond lilas (`assets/disc_lilac.png`) sont découpés à la même forme polygonale.
-- CV téléchargeable en deux versions : `assets/CV_Rimet_Tao_Couleur.pdf` et `assets/CV_Rimet_Tao_Imprimable.pdf`.
+- Contour des icônes : tracés vectoriels extraits du CV (`js/rings.js`), un par taille de pastille
+  (petites icônes, contacts, loisirs, photo). Les icônes, la photo et le fond lilas (`assets/disc_lilac.png`)
+  sont découpés à la même forme polygonale.
+- Fond animé : `js/bg.js`. Deux cadrages : normal (par défaut) et dézoomé, visible en ajoutant `?topo=dezoom`
+  à l'adresse du site. Pour changer le cadrage par défaut : `DEFAULT_PRESET` en tête du fichier.
+- CV téléchargeable en deux versions : `assets/CV_Rimet_Tao_Couleur.pdf` et `assets/CV_Rimet_Tao_Imprimable.pdf`
+  (la version imprimable est le même document recoloré en noir et blanc : mise en page identique).
 
 ## Structure
 - `index.html` : squelette de la page

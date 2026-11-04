@@ -133,14 +133,14 @@ window.PORTFOLIO = {
       genre: { fr: "FPS compétitif", en: "Competitive FPS" },
       type: { fr: "Map multijoueur (Deathmatch)", en: "Multiplayer map (Deathmatch)" },
       duration: { fr: "À compléter", en: "To be completed" },
-      engine: "Source 2 – Hammer",
+      engine: "Hammer Tools (Valve)",
       engineIcon: null,
-      engineMark: "S2", // pas de logo fourni : monogramme en attendant
-      team: null,       // nombre de personnes à renseigner
+      engineMark: "H", // pas de logo fourni : monogramme en attendant
+      team: 1,
       cover: null, preview: null, logo: null, map: null,
       context: {
-        fr: "Map Counter-Strike 2 réalisée avec les Workshop Tools (Hammer).",
-        en: "Counter-Strike 2 map made with the Workshop Tools (Hammer)."
+        fr: "Map Counter-Strike 2 réalisée seul avec Hammer Tools, l'éditeur de niveaux de Valve.",
+        en: "Counter-Strike 2 map made solo with Hammer Tools, Valve's level editor."
       },
       roles: [],
       sections: [
@@ -149,6 +149,22 @@ window.PORTFOLIO = {
         { title: { fr: "Ce que j'ai appris", en: "What I learned" } }
       ],
       links: []
+    },
+    {
+      id: "cs2-map-wip",
+      category: "personal",
+      wip: true,        // vignette non cliquable avec le bandeau « WIP »
+      title: "Counter-Strike 2 Map",
+      genre: { fr: "FPS compétitif", en: "Competitive FPS" },
+      type: { fr: "Map multijoueur", en: "Multiplayer map" },
+      duration: { fr: "En cours", en: "In progress" },
+      engine: "Hammer Tools (Valve)",
+      engineIcon: null,
+      engineMark: "H",
+      team: 1,
+      cover: null, preview: null, logo: null, map: null,
+      context: { fr: "Map Counter-Strike 2 en cours de réalisation.", en: "Counter-Strike 2 map in progress." },
+      roles: [], sections: [], links: []
     },
     {
       id: "gamejam-fast-fps",
@@ -229,9 +245,9 @@ window.PORTFOLIO = {
       links: []
     },
     {
-      id: "exercice-3",
+      id: "exercice-thief",
       category: "exercise",
-      title: "Exercice (titre à définir)",
+      title: "Exercice Thief",
       genre: { fr: "À compléter", en: "To be completed" },
       type: { fr: "Exercice de Level Design", en: "Level Design exercise" },
       duration: { fr: "À compléter", en: "To be completed" },
@@ -319,8 +335,9 @@ window.PORTFOLIO = {
     coverTodo: { fr: "Vignette à ajouter", en: "Cover to be added" },
     banner: { genre: { fr: "Genre", en: "Genre" }, logo: { fr: "Logo du jeu", en: "Game logo" }, map: { fr: "Illustration de la map", en: "Map illustration" } },
     cvLabel: { fr: "Télécharger mon CV", en: "Download my CV" },
-    cvColor: { fr: "CV – version couleur", en: "CV – color version" },
-    cvPrint: { fr: "CV – version imprimable (noir et blanc)", en: "CV – printable version (black & white)" },
+    cvColor: { fr: "CV - Version Couleur", en: "CV - Color Version" },
+    cvPrint: { fr: "CV - Version Imprimable", en: "CV - Printable Version" },
+    wipTitle: { fr: "Projet en cours : bientôt disponible", en: "Work in progress: coming soon" },
     linkedin: { fr: "LinkedIn", en: "LinkedIn" },
     menu: { fr: "Menu", en: "Menu" },
     notFound: { fr: "Page introuvable.", en: "Page not found." },

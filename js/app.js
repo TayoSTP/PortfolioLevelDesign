@@ -31,26 +31,28 @@
     play: '<path d="M8 5l11 7-11 7z"/>',
     link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1 M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
   };
-  const ringImg = (ring) =>
-    '<img class="ring" src="assets/ring_' + (/1e0e3b/i.test(ring) ? "night" : "white") + '.png" alt="" aria-hidden="true" draggable="false">';
+  /* contour vectoriel du CV ; kind = sm | md | lg | photo (voir js/rings.js) */
+  const ringImg = (ring, kind) =>
+    '<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">' +
+    (window.CV_RINGS[kind] || window.CV_RINGS.sm).map((d) => '<path fill="' + ring + '" fill-rule="evenodd" d="' + d + '"/>').join("") + "</svg>";
 
   /* badge image (icône du CV) ; ring = couleur du contour (#fefefe ou #1e0e3b) */
-  function badgeImg(src, ring, alt) {
-    return '<span class="badge" role="img" aria-label="' + esc(alt || "") + '"><img class="b-disc" src="' + src + '" alt="" draggable="false">' + ringImg(ring) + "</span>";
+  function badgeImg(src, ring, alt, kind) {
+    return '<span class="badge" role="img" aria-label="' + esc(alt || "") + '"><img class="b-disc" src="' + src + '" alt="" draggable="false">' + ringImg(ring, kind || "sm") + "</span>";
   }
-  /* badge à pictogramme : fond lilas du CV + pictogramme violet */
-  function badgeGlyph(name, ring) {
+  /* badge à pictogramme : fond lilas du CV + pictogramme bleu nuit (comme les icônes de contact) */
+  function badgeGlyph(name, ring, kind) {
     return '<span class="badge" aria-hidden="true"><img class="b-disc" src="assets/disc_lilac.png" alt="" draggable="false">' +
-      '<svg class="b-glyph" viewBox="0 0 24 24" fill="none" stroke="#644497" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + (GLYPHS[name] || GLYPHS.link) + "</svg>" + ringImg(ring) + "</span>";
+      '<svg class="b-glyph" viewBox="0 0 24 24" fill="none" stroke="#1e0e3b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (GLYPHS[name] || GLYPHS.link) + "</svg>" + ringImg(ring, kind || "md") + "</span>";
   }
   /* badge à monogramme (moteur sans logo fourni) */
-  function badgeText(txt, ring, alt) {
+  function badgeText(txt, ring, alt, kind) {
     return '<span class="badge" role="img" aria-label="' + esc(alt || "") + '"><img class="b-disc" src="assets/disc_lilac.png" alt="" draggable="false">' +
-      '<span class="b-text">' + esc(txt) + "</span>" + ringImg(ring) + "</span>";
+      '<span class="b-text">' + esc(txt) + "</span>" + ringImg(ring, kind || "sm") + "</span>";
   }
   /* variante : contour seul (pour y superposer un logo) */
-  function badgeEmpty(ring) {
-    return '<span class="badge" aria-hidden="true">' + ringImg(ring) + "</span>";
+  function badgeEmpty(ring, kind) {
+    return '<span class="badge" aria-hidden="true">' + ringImg(ring, kind || "lg") + "</span>";
   }
 
   /* ---------- bandeau supérieur ---------- */
@@ -58,7 +60,7 @@
     const bar = $("#topbar");
     bar.innerHTML =
       '<a class="brand" href="#/home" aria-label="' + esc(D.site.name) + '">' +
-        badgeImg("assets/photo.png", "#fefefe", "") +
+        badgeImg("assets/photo.png", "#fefefe", "", "photo") +
         '<span><span class="brand-name">' + esc(D.site.name) + '</span><span class="brand-sub">' + esc(t(D.site.role)) + "</span></span></a>" +
       '<button class="menu-btn" type="button" aria-expanded="false" aria-controls="tabs">' + esc(t(D.ui.menu)) + "</button>" +
       '<nav class="tabs" id="tabs" aria-label="Navigation">' +
@@ -73,13 +75,13 @@
   function renderFooter() {
     const c = D.site.contact, w = "#fefefe";
     const link = (href, inner, label, extra) =>
-      '<li><a class="icon-link" href="' + esc(href) + '" aria-label="' + esc(label) + '" title="' + esc(label) + '"' + (extra || "") + ">" + inner + "</a></li>";
+      '<li><a class="icon-link" href="' + esc(href) + '" aria-label="' + esc(label) + '" data-tip="' + esc(label) + '"' + (extra || "") + ">" + inner + "</a></li>";
     $("#footer").innerHTML =
       '<ul class="icons">' +
-      link("tel:" + c.phone, badgeImg("assets/icons/phone.png", w, ""), c.phone) +
-      link("mailto:" + c.email, badgeImg("assets/icons/mail.png", w, ""), c.email) +
-      link(c.linkedin, badgeImg("assets/icons/linkedin.png", w, ""), t(D.ui.linkedin), ' target="_blank" rel="noopener"') +
-      '<li class="cv-menu"><button class="icon-link cv-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="cv-pop" aria-label="' + esc(t(D.ui.cvLabel)) + '" title="' + esc(t(D.ui.cvLabel)) + '">' + badgeGlyph("doc", w) + "</button>" +
+      link("tel:" + c.phone, badgeImg("assets/icons/phone.png", w, "", "md"), c.phone) +
+      link("mailto:" + c.email, badgeImg("assets/icons/mail.png", w, "", "md"), c.email) +
+      link(c.linkedin, badgeImg("assets/icons/linkedin.png", w, "", "md"), t(D.ui.linkedin), ' target="_blank" rel="noopener"') +
+      '<li class="cv-menu"><button class="icon-link cv-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="cv-pop" aria-label="' + esc(t(D.ui.cvLabel)) + '" data-tip="CV">' + badgeGlyph("doc", w, "md") + "</button>" +
         '<div class="cv-pop" id="cv-pop" hidden>' +
           '<a href="' + esc(c.cvColor) + '" download>' + esc(t(D.ui.cvColor)) + "</a>" +
           '<a href="' + esc(c.cvPrint) + '" download>' + esc(t(D.ui.cvPrint)) + "</a></div></li>" +
@@ -106,13 +108,17 @@
       : '<div class="media grid-bg ph">' + esc(t(D.ui.coverTodo)) + "</div>";
     const n = p.team == null ? "?" : p.team;
     const peopleLabel = (p.team == null ? "" : p.team + " ") + t(D.ui.people);
-    return '<a class="tile" href="#/project/' + p.id + '"' + (p.preview ? ' data-video="' + esc(p.preview) + '"' : "") + ">" +
+    const open = p.wip
+      ? '<div class="tile wip" aria-disabled="true" title="' + esc(t(D.ui.wipTitle)) + '">'
+      : '<a class="tile" href="#/project/' + p.id + '"' + (p.preview ? ' data-video="' + esc(p.preview) + '"' : "") + ">";
+    return open +
+      (p.wip ? '<span class="wip-band grid-bg">WIP</span>' : "") +
       media +
       '<span class="chip">' + esc(t(chip.label)) + "</span>" +
       '<span class="cap"><span class="cap-main"><span class="cap-title">' + esc(p.title) + '</span><span class="cap-meta">' + esc(t(p.genre)) + "</span></span>" +
       '<span class="stats">' +
         '<span class="stat" title="' + esc(p.engine || "") + '">' + engineBadge(p, "#fefefe") + "</span>" +
-        '<span class="stat people" title="' + esc(peopleLabel) + '">' + PERSON + "<b>" + esc(n) + "</b></span></span></span></a>";
+        '<span class="stat people" title="' + esc(peopleLabel) + '">' + PERSON + "<b>" + esc(n) + "</b></span></span></span>" + (p.wip ? "</div>" : "</a>");
   }
   const grid = (list) => list.length
     ? '<div class="grid">' + list.map(tile).join("") + "</div>"
@@ -123,7 +129,6 @@
     main.innerHTML =
       '<h1 class="name">' + esc(D.site.name) + "</h1>" +
       '<p class="role">' + esc(t(D.site.role)) + "</p>" +
-      '<p class="traits">' + esc(t(D.site.traits)) + "</p>" +
       '<div class="hero-video" id="hero-video"></div>' +
       sectionTitle(t(D.ui.projects)) +
       grid(D.projects);
@@ -165,6 +170,7 @@
   function viewProject(id) {
     const p = D.projects.find((x) => x.id === id);
     if (!p) { main.innerHTML = '<p class="empty">' + esc(t(D.ui.notFound)) + "</p>"; return null; }
+    if (p.wip) { main.innerHTML = '<p class="empty">' + esc(t(D.ui.wipTitle)) + "</p>"; return p.category; }
     const back = D.tabs.find((x) => x.id === p.category);
     let html =
       '<a class="back" href="' + back.route + '">' + esc(t(D.ui.back)) + "</a>" +
@@ -211,7 +217,7 @@
       "<h3>" + esc(t(D.ui.education)) + "</h3><p>" + t(A.education) + "</p></div></div>" +
       sectionTitle(t(D.ui.hobbies)) +
       '<div class="hobbies">' + A.hobbies.map((h) =>
-        '<div class="hobby">' + badgeImg("assets/icons/" + h.icon + ".png", "#1e0e3b", t(h.name)) +
+        '<div class="hobby">' + badgeImg("assets/icons/" + h.icon + ".png", "#1e0e3b", t(h.name), "lg") +
         "<strong>" + esc(t(h.name)) + "</strong><span>" + esc(t(h.level)) + "</span><span>" + esc(t(h.freq)) + "</span><span>" + esc(t(h.years)) + "</span></div>").join("") + "</div>";
   }
 
