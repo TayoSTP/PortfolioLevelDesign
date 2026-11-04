@@ -11,7 +11,10 @@
        Quicksand sert de repli provisoire tant que Caviar Dreams n'est pas déposée. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Quicksand:wght@400;700&display=swap">
+  <!-- chargement non bloquant de Rajdhani (la page s'affiche sans attendre Google Fonts) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap"></noscript>
+  <link rel="preload" href="fonts/CaviarDreams.woff" as="font" type="font/woff" crossorigin>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>

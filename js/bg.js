@@ -20,17 +20,17 @@
 
   const canvas = document.getElementById("bg");
   if (!canvas) return;
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", { alpha: false }); // canvas opaque : composition plus rapide
   if (!ctx) return; // le fond blanc du CSS reste affiché si le canvas est indisponible
 
   /* ----- réglages ----- */
   const DEFAULT_PRESET = "normal";
   const PRESETS = {
-    normal: { SCALE: 0.0036 }, // zoom du relief (plus petit = formes plus larges)
-    dezoom: { SCALE: 0.0052 }
+    normal: { SCALE: 0.00313 }, // zoom du relief (plus petit = formes plus larges) ; rezoomé de 15 %
+    dezoom: { SCALE: 0.00452 }
   };
   const CELL_MIN = 9;       // finesse du calcul, en px CSS (plus petit = plus précis, plus lourd)
-  const MAX_CELLS = 22000;  // plafond de calcul : sur les grands écrans les cellules grandissent un peu
+  const MAX_CELLS = 18000;  // plafond de calcul : sur les grands écrans les cellules grandissent un peu
   const INTERVAL = 0.09;    // écart de hauteur entre deux courbes (plus petit = plus de lignes)
   const SLOPE = 0.45;       // pente diagonale générale (faisceaux de lignes parallèles)
   const WARP = 0.55;        // étirement des formes (alternance zones serrées / zones larges)
@@ -101,16 +101,35 @@
     );
   }
 
-  /* relief : bruit étiré (warp) + modulation d'amplitude + pente diagonale, ramené à l'intervalle */
-  function height(x, y, t) {
-    let u = x * SCALE, v = y * SCALE;
-    const wu = noise3(u * 0.55 + 5.2, v * 0.55 + 1.3, t * 0.7);
-    const wv = noise3(u * 0.55 - 8.1, v * 0.55 + 4.4, t * 0.7);
-    u += WARP * wu; v += WARP * wv;
-    const m = noise3(u * 0.35 + 31.7, v * 0.35 - 12.3, t * 0.5) * 0.5 + 0.5;
-    const amp = AMP_MIN + (1 - AMP_MIN) * 1.6 * m * m;
-    const n = noise3(u, v, t) * 0.88 + noise3(u * 2.1 + 7.3, v * 2.1 - 3.1, t * 1.3) * 0.12;
-    return (amp * n + SLOPE * (u * 0.85 + v * 0.4)) / INTERVAL;
+  /* relief : bruit étiré (warp) + modulation d'amplitude + pente diagonale, ramené à l'intervalle.
+     Optimisation : l'étirement et la modulation varient lentement, ils sont calculés sur une grille
+     3 fois plus grossière puis interpolés ; seul le détail est calculé en chaque point. */
+  const COARSE = 3;
+  let cCols = 0, cRows = 0, cwu = null, cwv = null, cam = null;
+  function computeField(t) {
+    for (let r = 0; r < cRows; r++) {
+      for (let c = 0; c < cCols; c++) {
+        const u = (c * COARSE - 1) * CELL * SCALE, v = (r * COARSE - 1) * CELL * SCALE, i = r * cCols + c;
+        const wu = noise3(u * 0.55 + 5.2, v * 0.55 + 1.3, t * 0.7);
+        const wv = noise3(u * 0.55 - 8.1, v * 0.55 + 4.4, t * 0.7);
+        cwu[i] = WARP * wu; cwv[i] = WARP * wv;
+        const m = noise3((u + cwu[i]) * 0.35 + 31.7, (v + cwv[i]) * 0.35 - 12.3, t * 0.5) * 0.5 + 0.5;
+        cam[i] = AMP_MIN + (1 - AMP_MIN) * 1.6 * m * m;
+      }
+    }
+    for (let r = 0; r < rows; r++) {
+      const fr = r / COARSE, r0 = Math.floor(fr), ry = fr - r0;
+      for (let c = 0; c < cols; c++) {
+        const fc = c / COARSE, c0 = Math.floor(fc), cx = fc - c0;
+        const i00 = r0 * cCols + c0, i01 = i00 + 1, i10 = i00 + cCols, i11 = i10 + 1;
+        const w00 = (1 - cx) * (1 - ry), w01 = cx * (1 - ry), w10 = (1 - cx) * ry, w11 = cx * ry;
+        const u = (c - 1) * CELL * SCALE + cwu[i00] * w00 + cwu[i01] * w01 + cwu[i10] * w10 + cwu[i11] * w11;
+        const v = (r - 1) * CELL * SCALE + cwv[i00] * w00 + cwv[i01] * w01 + cwv[i10] * w10 + cwv[i11] * w11;
+        const amp = cam[i00] * w00 + cam[i01] * w01 + cam[i10] * w10 + cam[i11] * w11;
+        const n = noise3(u, v, t) * 0.88 + noise3(u * 2.1 + 7.3, v * 2.1 - 3.1, t * 1.3) * 0.12;
+        field[r * cols + c] = (amp * n + SLOPE * (u * 0.85 + v * 0.4)) / INTERVAL;
+      }
+    }
   }
 
   /* ----- dimensions et tampons ----- */
@@ -131,6 +150,8 @@
     cols = Math.ceil(W / CELL) + 3;
     rows = Math.ceil(H / CELL) + 3;
     field = new Float32Array(cols * rows);
+    cCols = Math.floor((cols - 1) / COARSE) + 2; cRows = Math.floor((rows - 1) / COARSE) + 2;
+    cwu = new Float32Array(cCols * cRows); cwv = new Float32Array(cCols * cRows); cam = new Float32Array(cCols * cRows);
     const nEdges = 2 * cols * rows; // arêtes horizontales puis verticales
     ex = new Float32Array(nEdges); ey = new Float32Array(nEdges);
     nb1 = new Int32Array(nEdges).fill(-1); nb2 = new Int32Array(nEdges).fill(-1);
@@ -189,9 +210,7 @@
 
   function draw(now) {
     const t = now * 0.001 * SPEED;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) field[r * cols + c] = height((c - 1) * CELL, (r - 1) * CELL, t);
-    }
+    computeField(t);
 
     ctx.fillStyle = BACKGROUND;
     ctx.fillRect(0, 0, W, H);

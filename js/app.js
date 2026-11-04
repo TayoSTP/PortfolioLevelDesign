@@ -42,12 +42,12 @@
   }
   /* badge à pictogramme : fond lilas du CV + pictogramme bleu nuit (comme les icônes de contact) */
   function badgeGlyph(name, ring, kind) {
-    return '<span class="badge" aria-hidden="true"><img class="b-disc" src="assets/disc_lilac_' + (kind || "md") + '.png" alt="" draggable="false">' +
+    return '<span class="badge" aria-hidden="true"><img class="b-disc" src="assets/disc_lilac_' + (kind || "md") + '.webp" alt="" draggable="false">' +
       '<svg class="b-glyph" viewBox="0 0 24 24" fill="none" stroke="#1e0e3b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (GLYPHS[name] || GLYPHS.link) + "</svg>" + ringImg(ring, kind || "md") + "</span>";
   }
   /* badge à monogramme (moteur sans logo fourni) */
   function badgeText(txt, ring, alt, kind) {
-    return '<span class="badge" role="img" aria-label="' + esc(alt || "") + '"><img class="b-disc" src="assets/disc_lilac_' + (kind || "sm") + '.png" alt="" draggable="false">' +
+    return '<span class="badge" role="img" aria-label="' + esc(alt || "") + '"><img class="b-disc" src="assets/disc_lilac_' + (kind || "sm") + '.webp" alt="" draggable="false">' +
       '<span class="b-text">' + esc(txt) + "</span>" + ringImg(ring, kind || "sm") + "</span>";
   }
   /* variante : contour seul (pour y superposer un logo) */
@@ -60,7 +60,7 @@
     const bar = $("#topbar");
     bar.innerHTML =
       '<a class="brand" href="#/home" aria-label="' + esc(D.site.name) + '">' +
-        badgeImg("assets/photo.png", "#fefefe", "", "photo") +
+        badgeImg("assets/photo.webp", "#fefefe", "", "photo") +
         '<span><span class="brand-name">' + esc(D.site.name) + '</span><span class="brand-sub">' + esc(t(D.site.role)) + "</span></span></a>" +
       '<button class="menu-btn" type="button" aria-expanded="false" aria-controls="tabs">' + esc(t(D.ui.menu)) + "</button>" +
       '<nav class="tabs" id="tabs" aria-label="Navigation">' +
@@ -78,9 +78,9 @@
       '<li><a class="icon-link" href="' + esc(href) + '" aria-label="' + esc(label) + '" data-tip="' + esc(label) + '"' + (extra || "") + ">" + inner + "</a></li>";
     $("#footer").innerHTML =
       '<ul class="icons">' +
-      link("tel:" + c.phone, badgeImg("assets/icons/phone.png", w, "", "md"), c.phone) +
-      link("mailto:" + c.email, badgeImg("assets/icons/mail.png", w, "", "md"), c.email) +
-      link(c.linkedin, badgeImg("assets/icons/linkedin.png", w, "", "md"), t(D.ui.linkedin), ' target="_blank" rel="noopener"') +
+      link("tel:" + c.phone, badgeImg("assets/icons/phone.webp", w, "", "md"), c.phone) +
+      link("mailto:" + c.email, badgeImg("assets/icons/mail.webp", w, "", "md"), c.email) +
+      link(c.linkedin, badgeImg("assets/icons/linkedin.webp", w, "", "md"), t(D.ui.linkedin), ' target="_blank" rel="noopener"') +
       '<li class="cv-menu"><button class="icon-link cv-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="cv-pop" aria-label="' + esc(t(D.ui.cvLabel)) + '" data-tip="CV">' + badgeGlyph("doc", w, "md") + "</button>" +
         '<div class="cv-pop" id="cv-pop" hidden>' +
           '<a href="' + esc(c.cvColor) + '" download>' + esc(t(D.ui.cvColor)) + "</a>" +
@@ -97,7 +97,7 @@
 
   /* logo du moteur : icône du CV si disponible, sinon monogramme (« ? » tant que le moteur n'est pas renseigné) */
   function engineBadge(p, ring) {
-    if (p.engineIcon) return badgeImg("assets/icons/" + p.engineIcon + ".png", ring, p.engine);
+    if (p.engineIcon) return badgeImg("assets/icons/" + p.engineIcon + ".webp", ring, p.engine);
     return badgeText(p.engineMark || "?", ring, p.engine || "");
   }
 
@@ -167,46 +167,102 @@
       '<div class="banner-right">' + (p.map ? '<img src="' + esc(p.map) + '" alt="">' : placeholder(t(D.ui.banner.map))) + "</div></div></header>";
   }
 
+  /* ---------- page projet ----------
+     Mise en page inspirée des portfolios de référence (Project GLOW / Jedi DLC), dans la charte du CV.
+     Textes : lorem ipsum ; médias : emplacements « à ajouter ». */
+  const LOREM = {
+    p1: "Lorem ipsum dolor sit amet, <b>consectetur adipiscing</b> elit. Sed do eiusmod tempor incididunt ut labore et dolore <b>magna aliqua</b>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    p2: "Duis aute irure dolor in <b>reprehenderit</b> in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia <b>deserunt mollit</b> anim id est laborum.",
+    p3: "Curabitur pretium tincidunt lacus. Nulla gravida orci a odio, et <b>tempus</b> feugiat. Integer in mauris eu nibh euismod gravida.",
+    bullets: ["<b>Lorem ipsum</b> dolor sit amet", "Consectetur <b>adipiscing</b> elit", "Sed do <b>eiusmod</b> tempor incididunt"]
+  };
+  const media = (cls, cap) =>
+    "<figure class=\"p-fig\">" + placeholder(t(D.ui.mediaTodo), "p-ph " + cls) + (cap ? "<figcaption>" + esc(cap) + "</figcaption>" : "") + "</figure>";
+  const text = (...ps) => '<div class="p-text">' + ps.map((x) => "<p>" + x + "</p>").join("") + "</div>";
+  const list = (items) => '<ul class="p-list">' + items.map((x) => "<li>" + x + "</li>").join("") + "</ul>";
+  const secTitle = (label, side) => '<h2 class="sec-h ' + (side || "left") + '">' + esc(label) + "</h2>";
+
   function viewProject(id) {
     const p = D.projects.find((x) => x.id === id);
     if (!p) { main.innerHTML = '<p class="empty">' + esc(t(D.ui.notFound)) + "</p>"; return null; }
     if (p.wip) { main.innerHTML = '<p class="empty">' + esc(t(D.ui.wipTitle)) + "</p>"; return p.category; }
+    const U = D.ui.page;
     const back = D.tabs.find((x) => x.id === p.category);
-    let html =
-      '<a class="back" href="' + back.route + '">' + esc(t(D.ui.back)) + "</a>" +
-      banner(p) +
-      '<p class="proj-context">' + esc(t(p.context)) + "</p>";
+    const roles = p.roles && p.roles.length ? p.roles.map((r) => t(r)) : LOREM.bullets;
+    const team = p.team == null ? "?" : p.team;
+    const pill = (label, value, extra) =>
+      '<div class="pill-box"><span class="pill-label">' + esc(label) + '</span><span class="pill">' + (extra || "") + esc(value) + "</span></div>";
 
-    if (p.roles && p.roles.length) {
-      html += '<section class="block"><h3>' + esc(t(D.ui.myRoles)) + '</h3><ul class="roles">' +
-        p.roles.map((r) => "<li>" + t(r) + "</li>").join("") + "</ul></section>";
+    let h = '<a class="back" href="' + back.route + '">' + esc(t(D.ui.back)) + "</a>" + banner(p);
+
+    // 1. description + trailer (réf. Jedi DLC)
+    h += '<section class="p-intro"><div>' + secTitle(t(U.description)) + text(LOREM.p1, LOREM.p2) +
+      '<a class="btn" href="#" aria-disabled="true">' + badgeGlyph("download", "#fefefe") + "<span>" + esc(t(U.download)) + "</span></a></div>" +
+      "<div>" + media("r16x9", t(U.trailer)) + "</div></section>";
+
+    // 2. galerie de captures
+    h += '<section class="p-gallery">' + media("r16x9") + media("r4x3") + media("r4x3") + "</section>";
+
+    // 3. bandeau infos : missions / genre / durée / équipe / moteur (réf. Jedi DLC, aux couleurs du CV)
+    h += '<section class="p-info grid-bg"><div class="p-roles"><h3>' + esc(t(D.ui.myRoles)) + "</h3>" + list(roles) + "</div>" +
+      '<div class="p-pills">' +
+        pill(t(U.genre), t(p.genre)) + pill(t(U.duration), t(p.duration)) +
+        pill(t(U.team), team + " " + t(U.people)) +
+        pill(t(U.engine), p.engine || "?", '<span class="pill-badge">' + engineBadge(p, "#fefefe") + "</span>") +
+      "</div></section>";
+
+    // 4. contexte du jeu
+    h += '<section class="p-sec">' + secTitle(t(U.context)) + text(LOREM.p1) + "</section>";
+
+    // 5. documentation : moodboard + intentions (réf. Jedi DLC)
+    h += '<section class="p-sec">' + secTitle(t(U.documentation), "right") +
+      '<div class="p-split rev">' + media("r4x3", t(U.moodboard)) + "<div>" + text(LOREM.p1) + list(LOREM.bullets) + text(LOREM.p3) + "</div></div></section>";
+
+    // 6. flow du niveau
+    h += '<section class="p-sec">' + secTitle(t(U.flow)) +
+      '<div class="p-split">' + "<div>" + text(LOREM.p1, LOREM.p2) + "</div>" + media("r16x9", t(U.flowCap)) + "</div></section>";
+
+    // 7. moléculaire + layout (réf. Jedi DLC)
+    h += '<section class="p-sec">' + secTitle(t(U.molecular), "right") +
+      '<div class="p-split rev">' + media("r16x9", t(U.molecularCap)) + text(LOREM.p1, LOREM.p3) + "</div>" +
+      '<div class="p-full">' + media("r21x9", t(U.layoutCap)) + "</div></section>";
+
+    // 8. blockout + playtests
+    h += '<section class="p-sec">' + secTitle(t(U.blockout)) +
+      '<div class="p-split">' + text(LOREM.p1, LOREM.p2, LOREM.p3) + '<div class="p-stack">' + media("r16x9") + media("r16x9") + "</div></div></section>";
+
+    // 9. sessions QA (réf. Project GLOW)
+    h += '<section class="p-sec">' + secTitle(t(U.qa), "right") +
+      '<div class="p-split rev">' + media("r16x9", t(U.qaCap)) + text(LOREM.p1, LOREM.p2) + "</div></section>";
+
+    // 10. ce que j'ai appris
+    h += '<section class="p-sec p-learned">' + secTitle(t(U.learned), "center") + text(LOREM.p1) +
+      '<p class="p-allowed">' + esc(t(U.allowed)) + "</p>" + list(LOREM.bullets) + "</section>";
+
+    // 11. équipe (réf. Project GLOW) : uniquement pour les projets à plusieurs
+    if (p.team && p.team > 1) {
+      const n = Math.min(p.team - 1, 15);
+      h += '<section class="p-sec">' + secTitle(t(U.myTeam), "center") + '<p class="p-thanks">' + esc(t(U.thanks)) + "</p>" +
+        '<div class="p-full">' + media("r21x9") + "</div>" +
+        '<div class="p-team">' + Array.from({ length: n }, () =>
+          '<div class="member">' + placeholder("", "p-ph r1x1") + '<div class="member-card"><span class="member-name">' + esc(t(U.name)) +
+          '</span><span class="member-role">' + esc(t(U.role)) + "</span></div></div>").join("") + "</div></section>";
     }
-    // zone vidéo / trailer
-    html += '<section class="block"><h3>' + esc(t(D.ui.video)) + "</h3>" +
-      (p.preview
-        ? '<video controls playsinline preload="metadata" src="' + esc(p.preview) + '" style="width:100%;border:3px solid var(--night)"></video>'
-        : placeholder(t(D.ui.mediaTodo), "ph-box")) + "</section>";
-
-    (p.sections || []).forEach((s) => {
-      html += '<section class="block"><h3>' + esc(t(s.title)) + "</h3>" +
-        (s.text ? "<p>" + t(s.text) + "</p>" : '<p class="todo">' + esc(t(D.ui.todo)) + "</p>") +
-        (s.image ? "<figure><img src=\"" + esc(s.image) + '" alt="" loading="lazy">' + (s.caption ? "<figcaption>" + esc(t(s.caption)) + "</figcaption>" : "") + "</figure>" : "") +
-        "</section>";
-    });
 
     if (p.links && p.links.length) {
-      html += '<section class="block"><div class="links">' +
+      h += '<section class="p-sec"><div class="links">' +
         p.links.map((l) => '<a class="btn" href="' + esc(l.href) + '" target="_blank" rel="noopener">' + badgeGlyph(l.icon || "link", "#fefefe") + "<span>" + esc(t(l.label)) + "</span></a>").join("") +
         "</div></section>";
     }
-    main.innerHTML = html;
+    main.innerHTML = h;
+    main.querySelectorAll('a[aria-disabled="true"]').forEach((a) => a.addEventListener("click", (e) => e.preventDefault()));
     return p.category;
   }
 
   function viewInfos() {
     const A = D.about;
     const tools = (list) => '<div class="icon-row">' + list.map((x) =>
-      '<div class="icon-item">' + badgeImg("assets/icons/" + x[0] + ".png", "#1e0e3b", x[1]) + "<span>" + esc(x[1]) + "</span></div>").join("") + "</div>";
+      '<div class="icon-item">' + badgeImg("assets/icons/" + x[0] + ".webp", "#1e0e3b", x[1]) + "<span>" + esc(x[1]) + "</span></div>").join("") + "</div>";
     main.innerHTML =
       sectionTitle(t(D.ui.aboutMe)) +
       '<div class="about">' + A.text[lang].map((x) => "<p>" + x + "</p>").join("") + "</div>" +
@@ -217,7 +273,7 @@
       "<h3>" + esc(t(D.ui.education)) + "</h3><p>" + t(A.education) + "</p></div></div>" +
       sectionTitle(t(D.ui.hobbies)) +
       '<div class="hobbies">' + A.hobbies.map((h) =>
-        '<div class="hobby">' + badgeImg("assets/icons/" + h.icon + ".png", "#1e0e3b", t(h.name), "lg") +
+        '<div class="hobby">' + badgeImg("assets/icons/" + h.icon + ".webp", "#1e0e3b", t(h.name), "lg") +
         "<strong>" + esc(t(h.name)) + "</strong><span>" + esc(t(h.level)) + "</span><span>" + esc(t(h.freq)) + "</span><span>" + esc(t(h.years)) + "</span></div>").join("") + "</div>";
   }
 

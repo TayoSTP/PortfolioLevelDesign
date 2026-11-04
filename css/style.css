@@ -8,28 +8,28 @@
 
 @font-face {
   font-family: "Caviar Dreams";
-  src: url("../fonts/CaviarDreams.ttf") format("truetype");
+  src: url("../fonts/CaviarDreams.woff") format("woff"), url("../fonts/CaviarDreams.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Caviar Dreams";
-  src: url("../fonts/CaviarDreams_Bold.ttf") format("truetype");
+  src: url("../fonts/CaviarDreams_Bold.woff") format("woff"), url("../fonts/CaviarDreams_Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Caviar Dreams";
-  src: url("../fonts/CaviarDreams_Italic.ttf") format("truetype");
+  src: url("../fonts/CaviarDreams_Italic.woff") format("woff"), url("../fonts/CaviarDreams_Italic.ttf") format("truetype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: "Caviar Dreams";
-  src: url("../fonts/CaviarDreams_BoldItalic.ttf") format("truetype");
+  src: url("../fonts/CaviarDreams_BoldItalic.woff") format("woff"), url("../fonts/CaviarDreams_BoldItalic.ttf") format("truetype");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
@@ -650,4 +650,170 @@ main {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .tile, .btn, .tab::before, .tab::after { transition: none; }
+}
+
+/* ==========================================================
+   Pages projet (mise en page inspirée de Project GLOW / Jedi DLC, charte du CV)
+   ========================================================== */
+.p-intro {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 36px;
+  align-items: start;
+  margin: 8px 0 0;
+}
+.p-intro .btn { margin-top: 8px; }
+.btn[aria-disabled="true"] { cursor: default; }
+
+/* titres de section : trait d'un côté (alterné), comme les références */
+.sec-h {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 20px;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1.1;
+  color: var(--night);
+}
+.sec-h::after, .sec-h.right::before, .sec-h.center::before {
+  content: "";
+  flex: 1;
+  height: 3px;
+  background: var(--violet);
+}
+.sec-h.right::after { display: none; }
+.sec-h.right { flex-direction: row; }
+.sec-h.center::before, .sec-h.center::after { flex: 1; }
+
+.p-text p { margin: 0 0 14px; }
+.p-list { margin: 4px 0 16px; padding: 0; list-style: none; }
+.p-list li { position: relative; padding-left: 22px; margin: 6px 0; }
+.p-list li::before { content: "–"; position: absolute; left: 0; color: var(--violet); font-weight: 700; }
+
+/* médias à compléter */
+.p-fig { margin: 0; }
+.p-fig figcaption {
+  margin-top: 8px;
+  text-align: center;
+  font-style: italic;
+  font-size: 15px;
+  opacity: .85;
+}
+.p-ph { width: 100%; border: 3px solid var(--night); font-size: 18px; }
+.r16x9 { aspect-ratio: 16 / 9; }
+.r4x3 { aspect-ratio: 4 / 3; }
+.r21x9 { aspect-ratio: 21 / 9; }
+.r1x1 { aspect-ratio: 1; }
+
+/* galerie de captures */
+.p-gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 14px;
+  align-items: end;
+  margin: 40px 0;
+}
+
+/* bandeau infos aux couleurs du bandeau latéral du CV */
+.p-info {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 28px 40px;
+  padding: 28px clamp(18px, 3vw, 36px);
+  border: 3px solid var(--night);
+  color: var(--white);
+  margin: 0 0 8px;
+}
+.p-info h3 {
+  margin: 0 0 10px;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 28px;
+}
+.p-info b { color: var(--white); text-decoration: underline; text-decoration-color: var(--lilac); text-underline-offset: 3px; }
+.p-info .p-list li::before { color: var(--lilac); }
+.p-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: start; }
+.pill-box { display: flex; flex-direction: column; align-items: stretch; gap: 6px; text-align: center; }
+.pill-label {
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 6px 12px;
+  border: 2px solid var(--white);
+  background: var(--night);
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.15;
+}
+.pill-badge { display: inline-block; width: 32px; height: 32px; flex: none; font-size: 12px; }
+
+/* sections alternées texte / média */
+.p-sec { margin: 64px 0 0; }
+.p-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+.p-stack { display: grid; gap: 14px; }
+.p-full { margin-top: 24px; }
+
+.p-learned { max-width: 820px; margin-left: auto; margin-right: auto; }
+.p-allowed { margin: 18px 0 4px; font-family: var(--f-title); font-weight: 700; font-size: 22px; text-decoration: underline; text-decoration-color: var(--lilac); text-underline-offset: 4px; }
+.p-thanks { text-align: center; margin: -8px 0 18px; }
+
+/* équipe */
+.p-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  gap: 22px;
+  margin-top: 28px;
+}
+.member { position: relative; }
+.member .p-ph { border-width: 2px; }
+.member-card {
+  position: relative;
+  margin: -26px 0 0 14px;
+  padding: 8px 12px 10px;
+  background: var(--white);
+  border: 2px solid var(--night);
+  box-shadow: 4px 4px 0 var(--lilac);
+}
+.member-name {
+  display: block;
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 19px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.member-role { display: block; font-size: 15px; }
+
+@media (max-width: 900px) {
+  .p-intro, .p-info, .p-split { grid-template-columns: 1fr; }
+  .p-split.rev > :first-child { order: 2; }   /* sur mobile : le texte passe avant le média */
+  .p-gallery { grid-template-columns: 1fr 1fr; }
+  .p-gallery > :first-child { grid-column: 1 / -1; }
+  .p-sec { margin-top: 48px; }
+}
+@media (max-width: 420px) {
+  .p-pills { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .p-team { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .member-card { margin: -20px 0 0 8px; padding: 6px 8px 8px; }
+  .member-name { font-size: 16px; }
+  .member-role { font-size: 13px; }
 }

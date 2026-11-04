@@ -21,7 +21,7 @@ Les mots entre `<b>…</b>` s'affichent en violet gras, comme dans le CV.
 ## Charte
 - Polices : **Rajdhani** (titres, via Google Fonts) et **Caviar Dreams** (corps, fichiers dans `fonts/`).
 - Contour des icônes : tracés vectoriels extraits du CV (`js/rings.js`), un par taille de pastille
-  (petites icônes, contacts, loisirs, photo). Les icônes, la photo et le fond lilas (`assets/disc_lilac.png`)
+  (petites icônes, contacts, loisirs, photo). Les icônes, la photo et le fond lilas (`assets/disc_lilac_*.webp`)
   sont découpés à la même forme polygonale.
 - Fond animé : `js/bg.js`. Deux cadrages : normal (par défaut) et dézoomé, visible en ajoutant `?topo=dezoom`
   à l'adresse du site. Pour changer le cadrage par défaut : `DEFAULT_PRESET` en tête du fichier.
@@ -33,3 +33,14 @@ Les mots entre `<b>…</b>` s'affichent en violet gras, comme dans le CV.
 - `css/style.css` : charte (polices, palette, bandeaux, badges du CV)
 - `js/bg.js` : fond animé (courbes de niveau générées en code, réglages en tête de fichier)
 - `js/app.js` : navigation par onglets, bascule FR/EN, vidéo au survol, menu de téléchargement du CV
+
+## Poids et performances
+- Icônes, pastilles et photo en WebP, aux tailles réellement affichées.
+- Caviar Dreams en WOFF allégé (caractères latins uniquement) ; Rajdhani chargée sans bloquer l'affichage.
+- CV couleur allégé (2,6 Mo au lieu de 10,6 Mo, rendu identique) : aplats unis réduits, données de calques Photoshop retirées.
+- Fond animé : 12 images/s, calcul plafonné sur grands écrans, arrêt quand l'onglet est masqué.
+
+## Pages projet
+Gabarit commun (fonction `viewProject` dans `js/app.js`) : description + trailer, galerie, bandeau missions / genre / durée /
+équipe / moteur, contexte, documentation, flow, moléculaire et layout, blockout et playtests, QA, ce que j'ai appris, équipe.
+Textes provisoires en lorem ipsum.
