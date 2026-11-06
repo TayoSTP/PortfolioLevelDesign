@@ -19,6 +19,15 @@ window.PORTFOLIO = {
       en: "Calm - Meticulous - Pragmatic - Honest - Punctual"
     },
     introVideo: "media/intro.mp4", // vidéo d'accueil (optionnelle)
+    /* PDF affiché dans la visionneuse des pages projet (document provisoire).
+       file  : le PDF d'origine (lien « Ouvrir le PDF »)
+       pages : une image par page (affichage rapide, compatible téléphone).
+       Un projet peut avoir son propre « pdf: { file, pages } » ; sans « pages », le PDF s'affiche
+       dans la visionneuse du navigateur. */
+    placeholderPdf: {
+      file: "assets/docs/placeholder.pdf",
+      pages: ["assets/docs/placeholder/p1.webp", "assets/docs/placeholder/p2.webp", "assets/docs/placeholder/p3.webp", "assets/docs/placeholder/p4.webp"]
+    },
     contact: {
       phone: "+33681287945",
       email: "taorimet@gmail.com",
@@ -31,9 +40,9 @@ window.PORTFOLIO = {
   /* Onglets du bandeau supérieur */
   tabs: [
     { id: "home", route: "#/home", label: { fr: "Accueil", en: "Home" } },
-    { id: "professional", route: "#/professional", label: { fr: "Projet Professionnel", en: "Professional Project" } },
-    { id: "personal", route: "#/personal", label: { fr: "Projet Personnel", en: "Personal Project" } },
-    { id: "exercise", route: "#/exercise", label: { fr: "Exercice", en: "Exercise" } },
+    { id: "professional", route: "#/professional", label: { fr: "Projets Professionnels", en: "Professional Projects" } },
+    { id: "personal", route: "#/personal", label: { fr: "Projets Personnels", en: "Personal Projects" } },
+    { id: "exercise", route: "#/exercise", label: { fr: "Exercices", en: "Exercises" } },
     { id: "infos", route: "#/infos", label: { fr: "Infos", en: "Infos" } }
   ],
 
@@ -311,8 +320,8 @@ window.PORTFOLIO = {
   /* Textes de l'interface */
   ui: {
     projects: { fr: "Projets", en: "Projects" },
-    professional: { fr: "Projets professionnels", en: "Professional Projects" },
-    personal: { fr: "Projets personnels", en: "Personal Projects" },
+    professional: { fr: "Projets Professionnels", en: "Professional Projects" },
+    personal: { fr: "Projets Personnels", en: "Personal Projects" },
     exercise: { fr: "Exercices", en: "Exercises" },
     infos: { fr: "Infos", en: "Infos" },
     aboutMe: { fr: "À propos", en: "About me" },
@@ -337,7 +346,15 @@ window.PORTFOLIO = {
     cvPrint: { fr: "CV - Version Imprimable", en: "CV - Printable Version" },
     page: {
       description: { fr: "Description", en: "Description" },
-      download: { fr: "Télécharger le projet", en: "Download project" },
+      ldd: { fr: "Level Design Document", en: "Level Design Document" },
+      lddSub: { fr: "Consultez le document directement ci-dessous :", en: "You can have a look at the document right here:" },
+      openPdf: { fr: "Ouvrir le PDF", en: "Open the PDF" },
+      fullscreen: { fr: "Plein écran", en: "Fullscreen" },
+      prevPage: { fr: "Page précédente", en: "Previous page" },
+      nextPage: { fr: "Page suivante", en: "Next page" },
+      page: { fr: "Page", en: "Page" },
+      prevProject: { fr: "Projet précédent", en: "Previous project" },
+      nextProject: { fr: "Projet suivant", en: "Next project" },
       trailer: { fr: "Trailer du projet", en: "Project trailer" },
       genre: { fr: "Genre", en: "Genre" },
       duration: { fr: "Durée", en: "Duration" },

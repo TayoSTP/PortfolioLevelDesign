@@ -44,3 +44,13 @@ Les mots entre `<b>…</b>` s'affichent en violet gras, comme dans le CV.
 Gabarit commun (fonction `viewProject` dans `js/app.js`) : description + trailer, galerie, bandeau missions / genre / durée /
 équipe / moteur, contexte, documentation, flow, moléculaire et layout, blockout et playtests, QA, ce que j'ai appris, équipe.
 Textes provisoires en lorem ipsum.
+
+## Navigation entre projets
+Sur une page projet, des flèches fixes sur les côtés (ordinateur) et des liens en bas de page (tous écrans) mènent au projet
+précédent / suivant de la même catégorie, en boucle. Les projets « wip » sont exclus. L'ordre suit celui de `js/data.js`.
+
+## Documents PDF dans les pages projet
+Section « Level Design Document » : visionneuse intégrée (pages, flèches, clavier, glisser au doigt, plein écran, lien vers le PDF).
+- Document par défaut : `site.placeholderPdf` dans `js/data.js` (`assets/docs/placeholder.pdf`).
+- Pour un projet : ajouter `pdf: { file: "assets/docs/mon-doc.pdf", pages: ["assets/docs/mon-doc/p1.webp", …] }`.
+  Les images de pages s'affichent vite et partout (y compris Android). Sans `pages`, le PDF s'ouvre dans la visionneuse du navigateur.

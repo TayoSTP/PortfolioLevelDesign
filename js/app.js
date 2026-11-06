@@ -130,8 +130,8 @@
       '<h1 class="name">' + esc(D.site.name) + "</h1>" +
       '<p class="role">' + esc(t(D.site.role)) + "</p>" +
       '<div class="hero-video" id="hero-video"></div>' +
-      sectionTitle(t(D.ui.projects)) +
-      grid(D.projects);
+      ["professional", "personal", "exercise"].map((cat) =>
+        sectionTitle(t(D.ui[cat])) + grid(D.projects.filter((p) => p.category === cat))).join("");
     mountIntroVideo();
   }
 
@@ -182,6 +182,98 @@
   const list = (items) => '<ul class="p-list">' + items.map((x) => "<li>" + x + "</li>").join("") + "</ul>";
   const secTitle = (label, side) => '<h2 class="sec-h ' + (side || "left") + '">' + esc(label) + "</h2>";
 
+  /* ---------- visionneuse PDF ----------
+     Pages pré-converties en images : rapide, identique sur ordinateur et téléphone, sans téléchargement.
+     Sans images, repli sur la visionneuse PDF du navigateur. */
+  function pdfViewer(doc, title) {
+    const U = D.ui.page;
+    if (!doc) return "";
+    const open = '<a class="pdfv-btn" href="' + esc(doc.file) + '" target="_blank" rel="noopener">' + esc(t(U.openPdf)) + " ↗</a>";
+    if (!doc.pages || !doc.pages.length) {
+      return '<div class="pdfv"><iframe class="pdfv-frame" src="' + esc(doc.file) + '#view=FitH" title="' + esc(title) + '" loading="lazy"></iframe>' +
+        '<div class="pdfv-bar grid-bg"><span></span>' + open + "</div></div>";
+    }
+    const n = doc.pages.length;
+    return '<div class="pdfv" tabindex="0" role="region" aria-label="' + esc(t(U.ldd) + " – " + title) + '" data-pages="' + esc(JSON.stringify(doc.pages)) + '">' +
+      '<div class="pdfv-stage">' +
+        '<img class="pdfv-page" src="' + esc(doc.pages[0]) + '" alt="' + esc(t(U.page) + " 1 / " + n) + '" loading="lazy" draggable="false">' +
+        '<button class="pdfv-nav prev" type="button" aria-label="' + esc(t(U.prevPage)) + '">‹</button>' +
+        '<button class="pdfv-nav next" type="button" aria-label="' + esc(t(U.nextPage)) + '">›</button>' +
+      "</div>" +
+      '<div class="pdfv-bar grid-bg">' +
+        '<span class="pdfv-count" aria-live="polite">1 / ' + n + "</span>" +
+        '<div class="pdfv-thumbs">' + doc.pages.map((src, i) =>
+          '<button type="button" class="pdfv-thumb' + (i === 0 ? " on" : "") + '" data-i="' + i + '" aria-label="' + esc(t(U.page) + " " + (i + 1)) + '"><img src="' + esc(src) + '" alt="" loading="lazy" draggable="false"></button>').join("") + "</div>" +
+        '<span class="pdfv-tools">' + open +
+          '<button class="pdfv-btn pdfv-fs" type="button">' + esc(t(U.fullscreen)) + " ⛶</button></span>" +
+      "</div></div>";
+  }
+
+  function initPdfViewers() {
+    main.querySelectorAll(".pdfv[data-pages]").forEach((v) => {
+      const pages = JSON.parse(v.dataset.pages);
+      const img = v.querySelector(".pdfv-page"), count = v.querySelector(".pdfv-count");
+      const thumbs = [...v.querySelectorAll(".pdfv-thumb")];
+      let i = 0;
+      const show = (k) => {
+        i = (k + pages.length) % pages.length;
+        img.src = pages[i];
+        img.alt = t(D.ui.page.page) + " " + (i + 1) + " / " + pages.length;
+        count.textContent = (i + 1) + " / " + pages.length;
+        thumbs.forEach((b, j) => b.classList.toggle("on", j === i));
+        const pre = new Image(); pre.src = pages[(i + 1) % pages.length]; // précharge la page suivante
+      };
+      v.querySelector(".pdfv-nav.prev").addEventListener("click", () => show(i - 1));
+      v.querySelector(".pdfv-nav.next").addEventListener("click", () => show(i + 1));
+      thumbs.forEach((b) => b.addEventListener("click", () => show(+b.dataset.i)));
+      v.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") { e.preventDefault(); show(i - 1); }
+        if (e.key === "ArrowRight") { e.preventDefault(); show(i + 1); }
+      });
+      // glisser au doigt (téléphone / tablette)
+      let x0 = null;
+      const stage = v.querySelector(".pdfv-stage");
+      stage.addEventListener("pointerdown", (e) => { x0 = e.clientX; });
+      stage.addEventListener("pointerup", (e) => {
+        if (x0 === null) return;
+        const dx = e.clientX - x0; x0 = null;
+        if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+      });
+      // plein écran (masqué si le navigateur ne le permet pas, ex. iPhone)
+      const fs = v.querySelector(".pdfv-fs");
+      if (!v.requestFullscreen && !v.webkitRequestFullscreen) fs.hidden = true;
+      fs.addEventListener("click", () => {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else (v.requestFullscreen || v.webkitRequestFullscreen).call(v);
+      });
+    });
+  }
+
+  /* ---------- navigation entre projets d'une même catégorie (en boucle, hors WIP) ---------- */
+  function projectNav(p) {
+    const list = D.projects.filter((x) => x.category === p.category && !x.wip);
+    const k = list.findIndex((x) => x.id === p.id);
+    if (list.length < 2 || k < 0) return "";
+    const prev = list[(k - 1 + list.length) % list.length], next = list[(k + 1) % list.length];
+    const U = D.ui.page;
+    const thumb = (q) => q.cover
+      ? '<img src="' + esc(q.cover) + '" alt="" loading="lazy">'
+      : '<span class="pn-ph grid-bg"><span class="pn-badge">' + engineBadge(q, "#fefefe") + "</span></span>";
+    const arrow = (q, dir) =>
+      '<a class="pn-arrow ' + dir + '" href="#/project/' + q.id + '" aria-label="' + esc(t(dir === "prev" ? U.prevProject : U.nextProject) + " : " + q.title + " – " + t(q.genre)) + '">' +
+        '<span class="pn-chev grid-bg" aria-hidden="true">' + (dir === "prev" ? "‹" : "›") + "</span>" +
+        '<span class="pn-peek" aria-hidden="true"><span class="pn-thumb">' + thumb(q) + "</span>" +
+          '<span class="pn-label">' + esc(t(dir === "prev" ? U.prevProject : U.nextProject)) + "</span>" +
+          '<span class="pn-name">' + esc(q.title) + '</span><span class="pn-genre">' + esc(t(q.genre)) + "</span></span></a>";
+    const link = (q, dir) =>
+      '<a class="pn-link ' + dir + '" href="#/project/' + q.id + '"><span class="pn-label">' + esc(t(dir === "prev" ? U.prevProject : U.nextProject)) + "</span>" +
+        '<span class="pn-name">' + (dir === "prev" ? "← " : "") + esc(q.title) + (dir === "next" ? " →" : "") + "</span>" +
+        '<span class="pn-genre">' + esc(t(q.genre)) + "</span></a>";
+    return '<nav class="pn" aria-label="' + esc(t(D.tabs.find((x) => x.id === p.category).label)) + '">' +
+      arrow(prev, "prev") + arrow(next, "next") +
+      '<div class="pn-bottom">' + link(prev, "prev") + link(next, "next") + "</div></nav>";
+  }
+
   function viewProject(id) {
     const p = D.projects.find((x) => x.id === id);
     if (!p) { main.innerHTML = '<p class="empty">' + esc(t(D.ui.notFound)) + "</p>"; return null; }
@@ -196,8 +288,7 @@
     let h = '<a class="back" href="' + back.route + '">' + esc(t(D.ui.back)) + "</a>" + banner(p);
 
     // 1. description + trailer (réf. Jedi DLC)
-    h += '<section class="p-intro"><div>' + secTitle(t(U.description)) + text(LOREM.p1, LOREM.p2) +
-      '<a class="btn" href="#" aria-disabled="true">' + badgeGlyph("download", "#fefefe") + "<span>" + esc(t(U.download)) + "</span></a></div>" +
+    h += '<section class="p-intro"><div>' + secTitle(t(U.description)) + text(LOREM.p1, LOREM.p2) + "</div>" +
       "<div>" + media("r16x9", t(U.trailer)) + "</div></section>";
 
     // 2. galerie de captures
@@ -217,6 +308,10 @@
     // 5. documentation : moodboard + intentions (réf. Jedi DLC)
     h += '<section class="p-sec">' + secTitle(t(U.documentation), "right") +
       '<div class="p-split rev">' + media("r4x3", t(U.moodboard)) + "<div>" + text(LOREM.p1) + list(LOREM.bullets) + text(LOREM.p3) + "</div></div></section>";
+
+    // 5 bis. document consultable dans la page (visionneuse PDF)
+    h += '<section class="p-sec">' + secTitle(t(U.ldd), "center") + '<p class="p-thanks">' + esc(t(U.lddSub)) + "</p>" +
+      pdfViewer(p.pdf || D.site.placeholderPdf, p.title) + "</section>";
 
     // 6. flow du niveau
     h += '<section class="p-sec">' + secTitle(t(U.flow)) +
@@ -254,8 +349,9 @@
         p.links.map((l) => '<a class="btn" href="' + esc(l.href) + '" target="_blank" rel="noopener">' + badgeGlyph(l.icon || "link", "#fefefe") + "<span>" + esc(t(l.label)) + "</span></a>").join("") +
         "</div></section>";
     }
+    h += projectNav(p);
     main.innerHTML = h;
-    main.querySelectorAll('a[aria-disabled="true"]').forEach((a) => a.addEventListener("click", (e) => e.preventDefault()));
+    initPdfViewers();
     return p.category;
   }
 

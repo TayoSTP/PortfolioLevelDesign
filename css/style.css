@@ -817,3 +817,181 @@ main {
   .member-name { font-size: 16px; }
   .member-role { font-size: 13px; }
 }
+
+/* ==========================================================
+   Navigation entre projets d'une même catégorie
+   ========================================================== */
+/* flèches fixes sur les côtés : elles restent au centre de l'écran pendant le défilement */
+.pn-arrow {
+  position: fixed;
+  top: 50%;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+  text-decoration: none;
+  color: var(--white);
+}
+.pn-arrow.prev { left: 0; }
+.pn-arrow.next { right: 0; flex-direction: row-reverse; }
+.pn-chev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 84px;
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 2px var(--night);
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 46px;
+  line-height: 1;
+  padding-bottom: 6px;
+  transition: width .2s ease;
+}
+.pn-arrow.prev .pn-chev { border-left: 0; }
+.pn-arrow.next .pn-chev { border-right: 0; }
+.pn-arrow:hover .pn-chev, .pn-arrow:focus-visible .pn-chev { width: 52px; }
+/* aperçu au survol : visuel + nom du projet */
+.pn-peek {
+  display: flex;
+  flex-direction: column;
+  width: 230px;
+  padding: 10px;
+  background: var(--night);
+  border: 2px solid var(--white);
+  box-shadow: 4px 4px 0 var(--lilac);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s ease, transform .2s ease, visibility .2s;
+}
+.pn-arrow.prev .pn-peek { margin-left: 10px; transform: translateX(-12px); }
+.pn-arrow.next .pn-peek { margin-right: 10px; transform: translateX(12px); }
+.pn-arrow:hover .pn-peek, .pn-arrow:focus-visible .pn-peek { opacity: 1; visibility: visible; transform: none; }
+.pn-arrow:focus-visible { outline: none; }
+.pn-arrow:focus-visible .pn-chev { outline: 2px dashed var(--lilac); outline-offset: 3px; }
+.pn-thumb { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; margin-bottom: 8px; border: 2px solid var(--white); }
+.pn-thumb img, .pn-ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pn-ph { display: flex; align-items: center; justify-content: center; }
+.pn-badge { display: block; width: 52px; height: 52px; font-size: 16px; }
+.pn-label { display: block; font-size: 13px; opacity: .8; }
+.pn-name { display: block; font-family: var(--f-title); font-weight: 700; font-size: 22px; line-height: 1.1; }
+.pn-genre { display: block; font-size: 14px; opacity: .85; }
+
+/* liens précédent / suivant en bas de page (comme la référence) */
+.pn-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 72px;
+  padding-top: 22px;
+  border-top: 3px solid var(--night);
+}
+.pn-link { display: flex; flex-direction: column; text-decoration: none; color: var(--night); max-width: 48%; }
+.pn-link.next { text-align: right; margin-left: auto; }
+.pn-link .pn-name { color: var(--violet); }
+.pn-link:hover .pn-name { text-decoration: underline; text-decoration-color: var(--lilac); text-underline-offset: 4px; }
+
+/* place réservée aux flèches entre la tablette et le grand écran */
+@media (min-width: 901px) {
+  main:has(.pn-arrow) { padding-left: max(var(--gutter), 64px); padding-right: max(var(--gutter), 64px); }
+}
+/* téléphone / tablette : pas de survol ni de marge latérale → liens du bas uniquement */
+@media (max-width: 900px), (hover: none) {
+  .pn-arrow { display: none; }
+}
+
+/* ==========================================================
+   Visionneuse PDF
+   ========================================================== */
+.pdfv { border: 3px solid var(--night); background: var(--night); outline: none; }
+.pdfv:focus-visible { box-shadow: 0 0 0 3px var(--lilac); }
+.pdfv-stage { position: relative; background: #fff; user-select: none; touch-action: pan-y; }
+.pdfv-page { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; }
+.pdfv-frame { display: block; width: 100%; aspect-ratio: 16 / 10; border: 0; background: #fff; }
+.pdfv-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 64px;
+  border: 2px solid var(--white);
+  background: var(--violet);
+  color: var(--white);
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1;
+  padding-bottom: 6px;
+  cursor: pointer;
+  opacity: .85;
+  transition: opacity .15s ease;
+}
+.pdfv-nav:hover, .pdfv-nav:focus-visible { opacity: 1; }
+.pdfv-nav.prev { left: 10px; }
+.pdfv-nav.next { right: 10px; }
+.pdfv-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 14px;
+  color: var(--white);
+  border-top: 2px solid var(--white);
+}
+.pdfv-count { font-family: var(--f-title); font-weight: 700; font-size: 22px; min-width: 64px; }
+.pdfv-thumbs { display: flex; gap: 8px; overflow-x: auto; padding: 2px; flex: 1; justify-content: center; }
+.pdfv-thumb {
+  flex: none;
+  width: 72px;
+  padding: 0;
+  border: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  opacity: .6;
+}
+.pdfv-thumb img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.pdfv-thumb.on, .pdfv-thumb:hover { opacity: 1; border-color: var(--white); }
+.pdfv-tools { display: flex; gap: 8px; flex: none; }
+.pdfv-btn {
+  padding: 5px 12px;
+  border: 2px solid var(--white);
+  background: var(--night);
+  color: var(--white);
+  font-family: var(--f-title);
+  font-weight: 700;
+  font-size: 17px;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pdfv-btn:hover, .pdfv-btn:focus-visible { background: var(--lilac); color: var(--night); }
+.pdfv-btn[hidden] { display: none; }
+/* plein écran : la page occupe tout l'écran, la barre reste en bas */
+.pdfv:fullscreen { display: flex; flex-direction: column; border: 0; }
+.pdfv:fullscreen .pdfv-stage { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--night); }
+.pdfv:fullscreen .pdfv-page { width: auto; height: 100%; max-width: 100%; aspect-ratio: auto; }
+
+@media (max-width: 640px) {
+  .pdfv-thumbs { display: none; }
+  .pdfv-nav { width: 34px; height: 48px; font-size: 30px; }
+  .pdfv-btn { font-size: 15px; padding: 4px 9px; }
+  .pdfv-count { font-size: 19px; }
+}
+
+/* onglets : taille proportionnelle à la largeur de l'écran pour tenir sur une ligne */
+@media (min-width: 1201px) {
+  .tab { font-size: clamp(15px, 1.4vw, 22px); padding: 8px 2px; }
+  .tabs { gap: 4px clamp(6px, 1vw, 26px); }
+  .brand .badge { width: clamp(58px, 5vw, 72px); height: clamp(58px, 5vw, 72px); }
+  .brand-name { font-size: clamp(22px, 2vw, 28px); }
+}
+/* entre 901 et 1200 px : menu compact (comme sur téléphone), le reste de la page garde la mise en page large */
+@media (min-width: 901px) and (max-width: 1200px) {
+  .topbar { flex-wrap: wrap; gap: 10px; }
+  .brand { margin-right: auto; }
+  .menu-btn { display: inline-block; margin-left: 0; order: 3; }
+  .lang { order: 2; }
+  .tabs { display: none; flex: 1 1 100%; flex-direction: column; align-items: flex-start; order: 5; padding-top: 6px; }
+  .topbar.open .tabs { display: flex; }
+}
