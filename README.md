@@ -54,3 +54,7 @@ Section « Level Design Document » : visionneuse intégrée (pages, flèches, c
 - Document par défaut : `site.placeholderPdf` dans `js/data.js` (`assets/docs/placeholder.pdf`).
 - Pour un projet : ajouter `pdf: { file: "assets/docs/mon-doc.pdf", pages: ["assets/docs/mon-doc/p1.webp", …] }`.
   Les images de pages s'affichent vite et partout (y compris Android). Sans `pages`, le PDF s'ouvre dans la visionneuse du navigateur.
+
+## Mise à jour du site en ligne
+Après chaque modification, changer le numéro `?v=…` des fichiers CSS / JS dans `index.html` : les navigateurs rechargent
+alors immédiatement les nouveaux fichiers au lieu de garder l'ancienne version en cache (jusqu'à 10 minutes sur GitHub Pages).
